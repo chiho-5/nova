@@ -1,0 +1,12 @@
+fastembed 
+llama-index-embeddings-fastembed
+Pillow 
+scikit-learn 
+scipy 
+uvicorn 
+python-multipart 
+llama-index 
+llama-index-core 
+llama-index-readers-web 
+llama-index-llms-huggingface-api 
+fastapi
