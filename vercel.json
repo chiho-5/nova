@@ -1,0 +1,14 @@
+{
+  "builds": [
+    {
+      "src": "novapi.py",
+      "use": "@vercel/python"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "novapi.py"
+    }
+  ]
+}
