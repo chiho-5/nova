@@ -21,11 +21,7 @@ class ChatRequest(BaseModel):
 
 class FileUploadResponse(BaseModel):
     file_path: str
-    
-@app.get("/")
-def say_hi():
-    return "welcome to futo AI"
-    
+
 @app.post("/upload", response_model=FileUploadResponse)
 async def upload_file_endpoint(
     user_id: str = Form(...),
@@ -97,3 +93,19 @@ async def clear_local_content(user_id: str = Query(..., description="User ID to 
     except Exception as e:
         logger.error(f"Error clearing local content: {e}")
         raise HTTPException(status_code=500, detail=f"Error clearing local content: {str(e)}")
+
+@app.get("/reset")
+async def reset(user_id: str = Query(..., description="User ID to reset memory")):
+    try:
+        data_directory = f"./data/{user_id}"
+        # os.makedirs(data_directory, exist_ok=True)
+        space_ai = SpaceAI(data_directory=data_directory, query=None, user_id=user_id)
+        space_ai.reset_chat_memory()
+        logger.info("memory cleared successfully.")
+        return {"detail": "memory content cleared successfully."}
+
+    except Exception as e:
+        logger.error(f"Error clearing memory content: {e}")
+        raise HTTPException(status_code=500, detail=f"Error clearing memory content: {str(e)}")
+
+
