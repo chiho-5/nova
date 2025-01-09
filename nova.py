@@ -28,12 +28,11 @@ class SpaceAI:
         self.user_sessions = {}
         self.web_search = WebSearchFeature()
         self.global_content = [
-        "FUTO Space is a social media platform for Federal University of Technology Owerri (FUTO) students",
-        "offering tools for interaction, content sharing, and access to academic resources. Features include",
-        "personalized dashboards, posts and feeds, a chat system, a campus tour guide, a marketplace",
-        "monetization opportunities. The platform supports campus-specific functionalities such as events",
-        "academic material sharing, and campus map navigation. Key objectives include fostering community",
-        "engagement and providing students with academic and social support."
+        "FUTO Space", 
+        "campus tour guide", 
+        "futo space market place", 
+        "user dashboard"
+    
     ]
         self.global_content_directory = "./global_data"  # Directory for global content  # Timer to clear global content
         self.web_search_limit = 3  # Max web searches per user
