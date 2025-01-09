@@ -114,17 +114,14 @@ class SpaceAI:
     #     return similarity_score > 0.7
 
     def _is_global_context_relevant(self):
-        # Get embeddings for global content and query
-        global_embeddings = np.array([self.embed_model.get_text_embedding(text) for text in self.global_content])
-        query_embedding = np.array(self.embed_model.get_text_embedding(self.query))
+        query = self.query.lower()
 
-        # Flatten the global embeddings to a single vector (e.g., averaging or concatenating them)
-        global_embedding = np.mean(global_embeddings, axis=0).reshape(1, -1)  # Average the global embeddings
-        query_embedding = query_embedding.reshape(1, -1)  # Reshape query embedding to 2D
+        # Check if any of the target phrases are in the query
+        for phrase in self.global_content:
+            if phrase.lower() in query:
+                return True
 
-        # Compute cosine similarity
-        similarity_score = cosine_similarity(global_embedding, query_embedding)[0][0]
-        return similarity_score > 0.5
+        return False
 
 
 
