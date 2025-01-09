@@ -22,6 +22,10 @@ class ChatRequest(BaseModel):
 class FileUploadResponse(BaseModel):
     file_path: str
 
+@app.get("/")
+def say_hi():
+    return "welcome to Nova AI"
+
 @app.post("/upload", response_model=FileUploadResponse)
 async def upload_file_endpoint(
     user_id: str = Form(...),

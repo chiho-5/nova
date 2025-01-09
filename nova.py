@@ -8,7 +8,7 @@ from llama_index.core import SimpleDirectoryReader, VectorStoreIndex, SummaryInd
 from llama_index.llms.huggingface_api import HuggingFaceInferenceAPI
 from web_search import WebSearchFeature
 from llama_index.embeddings.fastembed import FastEmbedEmbedding
-from fastembed import TextEmbedding
+# from fastembed import TextEmbedding
 from huggingface_hub import InferenceClient
 from sklearn.metrics.pairwise import cosine_similarity
 from llama_index.readers.web import SimpleWebPageReader
@@ -48,7 +48,7 @@ class SpaceAI:
             max_new_tokens=2000,
         )
         self.embed_model = FastEmbedEmbedding(model_name="BAAI/bge-small-en-v1.5")
-        self.text_embed = TextEmbedding(model_name="BAAI/bge-small-en-v1.5")
+        # self.text_embed = TextEmbedding(model_name="BAAI/bge-small-en-v1.5")
         Settings.llm = self.llm
         # Settings.embed_model = HuggingFaceEmbedding(model_name="sentence-transformers/all-MiniLM-L6-v2")
         Settings.embed_model = self.embed_model
@@ -105,14 +105,27 @@ class SpaceAI:
             raise
 
     
-    def _is_global_context_relevant(self):
-        global_embedding = np.array(list(self.text_embed.embed([" ".join(self.global_content)])))
-        query_embedding = np.array(list(self.text_embed.embed([self.query])))  
+    # def _is_global_context_relevant(self):
+    #     global_embedding = np.array([self.embed_model.get_text_embedding(text) for text in self.global_content])
+    #     query_embedding = np.array((self.embed_model.get_text_embedding(self.query)))  
 
-        global_embedding = global_embedding.reshape(1, -1)
-        query_embedding = query_embedding.reshape(1, -1)
+    #     global_embedding = global_embedding.reshape(1, -1)
+    #     query_embedding = query_embedding.reshape(1, -1)
+    #     similarity_score = cosine_similarity(global_embedding, query_embedding)[0][0]
+    #     return similarity_score > 0.7
+
+    def _is_global_context_relevant(self):
+        # Get embeddings for global content and query
+        global_embeddings = np.array([self.embed_model.get_text_embedding(text) for text in self.global_content])
+        query_embedding = np.array(self.embed_model.get_text_embedding(self.query))
+
+        # Flatten the global embeddings to a single vector (e.g., averaging or concatenating them)
+        global_embedding = np.mean(global_embeddings, axis=0).reshape(1, -1)  # Average the global embeddings
+        query_embedding = query_embedding.reshape(1, -1)  # Reshape query embedding to 2D
+
+        # Compute cosine similarity
         similarity_score = cosine_similarity(global_embedding, query_embedding)[0][0]
-        return similarity_score > 0.7
+        return similarity_score > 0.5
 
 
 
