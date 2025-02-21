@@ -3,6 +3,12 @@ import logging
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from huggingface_hub import InferenceClient
+import os
+from dotenv import load_dotenv
+
+load_dotenv()  # Load variables from .env file
+
+HF_TOKEN = os.getenv("HF_TOKEN")
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -12,7 +18,7 @@ logger = logging.getLogger(__name__)
 app = FastAPI()
 
 # Hugging Face Inference Client configuration
-HF_TOKEN = "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"
+
 LLM_MODEL = "mistralai/Mistral-7B-Instruct-v0.3"
 
 client = InferenceClient(model=LLM_MODEL, token=HF_TOKEN)
