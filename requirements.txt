@@ -2,3 +2,4 @@ huggingface-hub
 fastapi
 uvicorn
 python-multipart
+python-dotenv
