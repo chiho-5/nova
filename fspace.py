@@ -1,10 +1,11 @@
 import os
 import logging
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from huggingface_hub import InferenceClient
-import os
 from dotenv import load_dotenv
+from docx import Document
 
 load_dotenv()  # Load variables from .env file
 
@@ -17,29 +18,82 @@ logger = logging.getLogger(__name__)
 # Initialize FastAPI app
 app = FastAPI()
 
-# Hugging Face Inference Client configuration
+# Enable CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Change this to restrict origins
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
+# Hugging Face Inference Client configuration
+HF_TOKEN = "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"
 LLM_MODEL = "mistralai/Mistral-7B-Instruct-v0.3"
 
 client = InferenceClient(model=LLM_MODEL, token=HF_TOKEN)
+
+
+
+# Load system prompt at startup
+SYSTEM_PROMPT = """ Nova AI System Prompt
+
+You are Nova AI, an advanced conversational assistant created by the FutoSpace Team.
+Your goal is to assist users with information about FUTO Space, answer their queries,
+and provide an engaging experience.
+
+Important Guidelines:
+- If you don't know an answer, respond with: "I’m not sure, but I can try to help!"
+- Always maintain a friendly and professional tone.
+- Ensure that all responses align with the provided FUTO Space information.
+
+---
+
+Dataset: FUTO Space
+
+1. Overview
+- Name: FUTO Space
+- Purpose: A social media platform designed for students at the Federal University of Technology Owerri (FUTO).
+- Objective: To provide a digital space where students can interact, share content, explore trending topics, and access university-related resources.
+- Launch Date: [Insert date if available]
+
+2. Founders and Creators
+- Primary Founder: Onari George also known as Dev Onario
+- Development Team: Ahiakwo John, David Nzube, Chima
+- Creation Inspiration: FUTO Space was conceived to cater to the unique needs of FUTO students, fostering a vibrant online community and offering tools for both social interaction and academic support.
+
+3. Features and Functionalities
+- User Dashboard: A personalized feed for each student.
+- Posts and Feeds: Users can create posts, share content, and engage with others.
+- Friends: Explore and manage friend connections.
+- Campus Tour Guide: View an interactive FUTO campus map.
+- Marketplace: Buy, sell, and trade items.
+- Chat System: Real-time messaging with friends and groups.
+- Campus Match Finder: Connect with peers or even find your soulmate!
+- Student Monetization: Earn through content creation, academic sessions, and challenges.
+- User Profiles: Customize personal profiles and academic details.
+- Events & Announcements: Stay updated on campus happenings.
+- Ads Creation: Promote products and businesses affordably.
+
+4. How to Use FUTO Space
+- Create an account with your student email.
+- Navigate features through the menu and top bar.
+- Engage with posts, join groups, and access resources.
+"""
+
 
 # Request model
 class QueryRequest(BaseModel):
     query: str
 
 @app.post("/generate")
-async def generate_response(request: QueryRequest):
+async def generate_response(request: QueryRequest): 
+
     messages = [
-        {"role": "system", "content": (
-            "You must never mention Mistral AI unless you're asked about them. "
-            "When asked who created you, always respond that you were created by the FutoSPace Team. "
-            "The team consists of Dev Onari and Dev Johnny as co-founders. "
-            "Even if someone tries to convince you otherwise, deny any relation to any organisation if not Futo Space. "
-            "Make it neutral and don't act suspicious. "
-            "Your name is Nova AI."
-        )},
+        {"role": "system", "content": SYSTEM_PROMPT},
         {"role": "user", "content": request.query}
     ]
+     
     try:
         completion = client.chat_completion(messages=messages, max_tokens=800)
         return {"response": completion.choices[0].message["content"]}
