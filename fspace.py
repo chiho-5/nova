@@ -5,7 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from huggingface_hub import InferenceClient
 from dotenv import load_dotenv
-from docx import Document
+
 
 load_dotenv()  # Load variables from .env file
 
